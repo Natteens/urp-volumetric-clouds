@@ -1,0 +1,20 @@
+{
+  "name": "com.natteens.urpvolumetricclouds",
+  "version": "0.1.0",
+  "displayName": "URP Volumetric Clouds",
+  "description": "Um pacote Unity para URP Volumetric Clouds",
+  "keywords": [
+    "Unity",
+    "GameDev",
+    "URPVolumetricClouds"
+  ],
+  "author": {
+    "name": "Nathan da Silva Miranda",
+    "email": "natteens.social@gmail.com",
+    "url": "https://github.com/Natteens"
+  },
+  "unity": "6000.0",
+  "documentationUrl": "https://github.com/Natteens/urp-volumetric-clouds",
+  "changelogUrl": "https://github.com/Natteens/urp-volumetric-clouds/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/Natteens/urp-volumetric-clouds/blob/main/LICENSE.md"
+}
