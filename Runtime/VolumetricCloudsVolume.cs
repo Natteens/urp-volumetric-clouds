@@ -8,7 +8,6 @@ using UnityEngine.Rendering.Universal;
 #else
 [Serializable, VolumeComponentMenuForRenderPipeline("Sky/Volumetric Clouds (URP)", typeof(UniversalRenderPipeline))]
 #endif
-[HelpURL("https://github.com/jiaozi158/UnityVolumetricCloudsURP/tree/main")]
 public class VolumetricClouds : VolumeComponent, IPostProcessComponent
 {
     /// <summary>

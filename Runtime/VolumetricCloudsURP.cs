@@ -16,18 +16,17 @@ using UnityEngine.Rendering.RenderGraphModule;
 /// </summary>
 [DisallowMultipleRendererFeature("Volumetric Clouds URP")]
 [Tooltip("Add this Renderer Feature to support volumetric clouds in URP Volume.")]
-[HelpURL("https://github.com/jiaozi158/UnityVolumetricCloudsURP/tree/main")]
 public class VolumetricCloudsURP : ScriptableRendererFeature
 {
     [Header("Setup")]
     [Tooltip("The material of volumetric clouds shader.")]
     [SerializeField] private Material material;
     [Tooltip("Enable this to render volumetric clouds in Rendering Debugger view. \nThis is disabled by default to avoid affecting the individual lighting previews.")]
-    [SerializeField] private bool renderingDebugger = false;
+    [SerializeField] private bool renderingDebugger;
 
     [Header("Performance")]
     [Tooltip("Specifies if URP renders volumetric clouds in both real-time and baked reflection probes. \nVolumetric clouds in real-time reflection probes may reduce performance.")]
-    [SerializeField] private bool reflectionProbe = false;
+    [SerializeField] private bool reflectionProbe;
     [Range(0.25f, 1.0f), Tooltip("The resolution scale for volumetric clouds rendering.")]
     [SerializeField] private float resolutionScale = 0.5f;
     [Tooltip("Select the method to use for upscaling volumetric clouds.")]
@@ -39,7 +38,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     [Tooltip("Specifies the volumetric clouds ambient probe update frequency.")]
     [SerializeField] private CloudsAmbientMode ambientProbe = CloudsAmbientMode.Dynamic;
     [Tooltip("Specifies if URP calculates physically based sun attenuation for volumetric clouds.")]
-    [SerializeField] private bool sunAttenuation = false;
+    [SerializeField] private bool sunAttenuation;
 
     [Header("Wind")]
     [Tooltip("Enable to reset the wind offsets to their initial states when start playing.")]
@@ -50,7 +49,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     [SerializeField] private bool outputDepth = true;
 
     [Header("Experimental"), Tooltip("Specifies if URP also outputs volumetric clouds average depth to \"_CameraDepthTexture\".")]
-    [SerializeField] private bool depthTexture = false;
+    [SerializeField] private bool depthTexture;
 
     private const string shaderName = "Hidden/Sky/VolumetricClouds";
     private const string VOLUMETRIC_CLOUDS = "VOLUMETRIC_CLOUDS";
@@ -60,8 +59,8 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     private VolumetricCloudsShadowsPass volumetricCloudsShadowsPass;
 
     // Pirnt message only once.
-    private bool isLogPrinted = false;
-    private bool isCookiePrinted = false;
+    private bool isLogPrinted;
+    private bool isCookiePrinted;
 
     /// <summary>
     /// Gets or sets the material of volumetric clouds shader.
