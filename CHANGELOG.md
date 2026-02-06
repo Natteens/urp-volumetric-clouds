@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.1.0...v0.1.1) (2026-02-06)
+
+
+### Bug Fixes
+
+* Unhide VolumetricClouds shader ([22ffff4](https://github.com/Natteens/urp-volumetric-clouds/commit/22ffff4a8f9b165c29be5530cf324c109b005d1e))
+
 # 📝 Changelog
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
