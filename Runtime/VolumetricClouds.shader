@@ -1,4 +1,4 @@
-Shader "Hidden/Sky/VolumetricClouds"
+Shader "Sky/VolumetricClouds"
 {
     Properties
     {
