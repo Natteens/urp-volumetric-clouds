@@ -51,7 +51,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     [Header("Experimental"), Tooltip("Specifies if URP also outputs volumetric clouds average depth to \"_CameraDepthTexture\".")]
     [SerializeField] private bool depthTexture;
 
-    private const string shaderName = "Hidden/Sky/VolumetricClouds";
+    private const string shaderName = "Sky/VolumetricClouds";
     private const string VOLUMETRIC_CLOUDS = "VOLUMETRIC_CLOUDS";
     private const string VISUAL_ENVIRONMENT_DYNAMIC_SKY = "VISUAL_ENVIRONMENT_DYNAMIC_SKY";
     private VolumetricCloudsPass volumetricCloudsPass;
