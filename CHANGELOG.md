@@ -1,3 +1,10 @@
+## [0.1.2](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.1.1...v0.1.2) (2026-02-07)
+
+
+### Bug Fixes
+
+* Expose cloud shader and add sample material meta ([70af0db](https://github.com/Natteens/urp-volumetric-clouds/commit/70af0db961524ce7aee79f5304a85ef562a4e050))
+
 ## [0.1.1](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.1.0...v0.1.1) (2026-02-06)
 
 
