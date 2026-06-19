@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.2.0...v0.2.1) (2026-06-19)
+
+
+### Bug Fixes
+
+* Guard null render passes; add sample material ([8f4cebd](https://github.com/Natteens/urp-volumetric-clouds/commit/8f4cebdf8523f5e8aeb8d0e1ada78e1984bb1cba))
+
 # [0.2.0](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.1.2...v0.2.0) (2026-06-19)
 
 
