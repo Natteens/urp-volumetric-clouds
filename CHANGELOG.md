@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.2.1...v0.3.0) (2026-06-19)
+
+
+### Features
+
+* Add optional depth-aware cloud edge softness ([ec76b51](https://github.com/Natteens/urp-volumetric-clouds/commit/ec76b519bc1a540c16a7767eb53ecb24000afd8e))
+
 ## [0.2.1](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.2.0...v0.2.1) (2026-06-19)
 
 
