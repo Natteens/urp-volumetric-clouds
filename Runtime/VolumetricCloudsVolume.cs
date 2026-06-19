@@ -293,6 +293,9 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
     [Tooltip("Controls the number of steps when evaluating the clouds' lighting. A higher value will lead to smoother lighting and improved self-shadowing, but at a higher cost.")]
     public ClampedIntParameter numLightSteps = new(2, 1, 16);
 
+    [SerializeField] CloudQualityPreset m_QualityPreset = CloudQualityPreset.Manual;
+    [SerializeField, HideInInspector] CloudQualityPreset m_AppliedQualityPreset = CloudQualityPreset.Manual;
+
     /// <summary>
     /// Controls the mode in which the clouds fade in when close to the camera's near plane.
     /// </summary>
@@ -318,6 +321,54 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
 
     // This is unused since 2023.1
     public bool IsTileCompatible() => false;
+
+    public enum CloudQualityPreset
+    {
+        Manual = 0,
+        Low,
+        Medium,
+        High,
+        Cinematic
+    }
+
+    public CloudQualityPreset qualityPreset
+    {
+        get { return m_QualityPreset; }
+        set { m_QualityPreset = value; ApplyQualityPreset(); }
+    }
+
+    void ApplyQualityPreset()
+    {
+        m_AppliedQualityPreset = m_QualityPreset;
+        if (m_QualityPreset == CloudQualityPreset.Manual)
+            return;
+
+        switch (m_QualityPreset)
+        {
+            case CloudQualityPreset.Low:
+                numPrimarySteps.value = 24; numLightSteps.value = 1; temporalAccumulationFactor.value = 0.95f; perceptualBlending.value = 1.0f;
+                break;
+            case CloudQualityPreset.Medium:
+                numPrimarySteps.value = 32; numLightSteps.value = 2; temporalAccumulationFactor.value = 0.95f; perceptualBlending.value = 1.0f;
+                break;
+            case CloudQualityPreset.High:
+                numPrimarySteps.value = 64; numLightSteps.value = 4; temporalAccumulationFactor.value = 0.9f; perceptualBlending.value = 1.0f;
+                break;
+            case CloudQualityPreset.Cinematic:
+                numPrimarySteps.value = 128; numLightSteps.value = 6; temporalAccumulationFactor.value = 0.85f; perceptualBlending.value = 1.0f;
+                break;
+        }
+        numPrimarySteps.overrideState = true;
+        numLightSteps.overrideState = true;
+        temporalAccumulationFactor.overrideState = true;
+        perceptualBlending.overrideState = true;
+    }
+
+    void OnValidate()
+    {
+        if (m_QualityPreset != m_AppliedQualityPreset)
+            ApplyQualityPreset();
+    }
 
     /// <summary>
     /// The set of available presets for the simple cloud control mode.

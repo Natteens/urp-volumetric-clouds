@@ -2,7 +2,7 @@
   "name": "com.natteens.urpvolumetricclouds",
   "version": "0.1.2",
   "displayName": "URP Volumetric Clouds",
-  "description": "Um pacote Unity para URP Volumetric Clouds",
+  "description": "Volumetric clouds for the Universal Render Pipeline (URP).",
   "keywords": [
     "Unity",
     "GameDev",

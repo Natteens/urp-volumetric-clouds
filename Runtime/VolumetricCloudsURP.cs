@@ -25,6 +25,9 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     [SerializeField] private bool renderingDebugger;
 
     [Header("Performance")]
+    [Tooltip("Quality preset for the Renderer Feature. Manual keeps your current values; other presets set resolution scale and upscale mode once when selected.")]
+    [SerializeField] private CloudsQualityPreset qualityPreset = CloudsQualityPreset.Manual;
+    [SerializeField, HideInInspector] private CloudsQualityPreset appliedQualityPreset = CloudsQualityPreset.Manual;
     [Tooltip("Specifies if URP renders volumetric clouds in both real-time and baked reflection probes. \nVolumetric clouds in real-time reflection probes may reduce performance.")]
     [SerializeField] private bool reflectionProbe;
     [Range(0.25f, 1.0f), Tooltip("The resolution scale for volumetric clouds rendering.")]
@@ -99,6 +102,12 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     {
         get { return resolutionScale; }
         set { resolutionScale = Mathf.Clamp(value, 0.25f, 1.0f); }
+    }
+
+    public CloudsQualityPreset QualityPreset
+    {
+        get { return qualityPreset; }
+        set { qualityPreset = value; ApplyQualityPreset(); }
     }
 
     /// <summary>
@@ -210,6 +219,38 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
 
         [Tooltip("Use more computationally expensive filtering for volumetric clouds upscale. \nThis blurs the cloud details but reduces the noise that may appear at lower clouds resolutions.")]
         Bilateral
+    }
+
+    public enum CloudsQualityPreset
+    {
+        [Tooltip("Keep the current Renderer Feature values without applying a preset.")]
+        Manual = 0,
+        Low,
+        Medium,
+        High,
+        Cinematic
+    }
+
+    private void ApplyQualityPreset()
+    {
+        switch (qualityPreset)
+        {
+            case CloudsQualityPreset.Low:
+                resolutionScale = 0.25f; upscaleMode = CloudsUpscaleMode.Bilateral; break;
+            case CloudsQualityPreset.Medium:
+                resolutionScale = 0.5f; upscaleMode = CloudsUpscaleMode.Bilateral; break;
+            case CloudsQualityPreset.High:
+                resolutionScale = 0.75f; upscaleMode = CloudsUpscaleMode.Bilateral; break;
+            case CloudsQualityPreset.Cinematic:
+                resolutionScale = 1.0f; upscaleMode = CloudsUpscaleMode.Bilinear; break;
+        }
+        appliedQualityPreset = qualityPreset;
+    }
+
+    private void OnValidate()
+    {
+        if (qualityPreset != appliedQualityPreset)
+            ApplyQualityPreset();
     }
 
     public override void Create()
@@ -503,44 +544,36 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         private float verticalErosionOffset = 0.0f;
         private Vector2 windVector = Vector2.zero;
 
+        private bool keywordStateValid;
+        private bool kwLocalClouds, kwMicroErosion, kwLowResClouds, kwAmbientProbe, kwOutputDepth, kwPhysicalSun, kwPerceptualBlending;
+
         private static float square(float x) => x * x;
+
+        private void SetKeyword(string keyword, bool enable, ref bool cached)
+        {
+            if (keywordStateValid && enable == cached)
+                return;
+            cached = enable;
+            if (enable) cloudsMaterial.EnableKeyword(keyword);
+            else cloudsMaterial.DisableKeyword(keyword);
+        }
 
         private void UpdateMaterialProperties(Camera camera)
         {
         #if URP_PBSKY
             bool isVolumeActive = visualEnvVolume != null && visualEnvVolume.IsActive() && visualEnvVolume.skyType.value != 0;
-            if (isVolumeActive)
-            {
-                if (visualEnvVolume.renderingSpace.value == VisualEnvironment.RenderingSpace.World) { cloudsMaterial.EnableKeyword(localClouds); }
-                else { cloudsMaterial.DisableKeyword(localClouds); }
-            }
-            else
-            {
-                if (cloudsVolume.localClouds.value) { cloudsMaterial.EnableKeyword(localClouds); }
-                else { cloudsMaterial.DisableKeyword(localClouds); }
-            }
+            bool localCloudsOn = isVolumeActive ? (visualEnvVolume.renderingSpace.value == VisualEnvironment.RenderingSpace.World) : cloudsVolume.localClouds.value;
         #else
-            if (cloudsVolume.localClouds.value) { cloudsMaterial.EnableKeyword(localClouds); }
-            else { cloudsMaterial.DisableKeyword(localClouds); }
+            bool localCloudsOn = cloudsVolume.localClouds.value;
         #endif
-
-            if (cloudsVolume.microErosion.value && cloudsVolume.microErosionFactor.value > 0.0f) { cloudsMaterial.EnableKeyword(microErosion); }
-            else { cloudsMaterial.DisableKeyword(microErosion); }
-
-            if (resolutionScale < 1.0f && upscaleMode == CloudsUpscaleMode.Bilateral) { cloudsMaterial.EnableKeyword(lowResClouds); }
-            else { cloudsMaterial.DisableKeyword(lowResClouds); }
-
-            if (dynamicAmbientProbe) { cloudsMaterial.EnableKeyword(cloudsAmbientProbe); }
-            else { cloudsMaterial.DisableKeyword(cloudsAmbientProbe); }
-
-            if (outputDepth) { cloudsMaterial.EnableKeyword(outputCloudsDepth); }
-            else { cloudsMaterial.DisableKeyword(outputCloudsDepth); }
-
-            if (sunAttenuation) { cloudsMaterial.EnableKeyword(physicallyBasedSun); }
-            else { cloudsMaterial.DisableKeyword(physicallyBasedSun); }
-
-            if (cloudsVolume.perceptualBlending.value > 0.0f) { cloudsMaterial.EnableKeyword(perceptualBlending); }
-            else { cloudsMaterial.DisableKeyword(perceptualBlending); }
+            SetKeyword(localClouds, localCloudsOn, ref kwLocalClouds);
+            SetKeyword(microErosion, cloudsVolume.microErosion.value && cloudsVolume.microErosionFactor.value > 0.0f, ref kwMicroErosion);
+            SetKeyword(lowResClouds, resolutionScale < 1.0f && upscaleMode == CloudsUpscaleMode.Bilateral, ref kwLowResClouds);
+            SetKeyword(cloudsAmbientProbe, dynamicAmbientProbe, ref kwAmbientProbe);
+            SetKeyword(outputCloudsDepth, outputDepth, ref kwOutputDepth);
+            SetKeyword(physicallyBasedSun, sunAttenuation, ref kwPhysicalSun);
+            SetKeyword(perceptualBlending, cloudsVolume.perceptualBlending.value > 0.0f, ref kwPerceptualBlending);
+            keywordStateValid = true;
 
             cloudsMaterial.SetFloat(numPrimarySteps, cloudsVolume.numPrimarySteps.value);
             cloudsMaterial.SetFloat(numLightSteps, cloudsVolume.numLightSteps.value);

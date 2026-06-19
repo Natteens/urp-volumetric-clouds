@@ -314,6 +314,10 @@ class VolumetricCloudsEditor : VolumeComponentEditor
 
         //DrawHeader("Quality");
         {
+            SerializedProperty qualityPresetProp = serializedObject.FindProperty("m_QualityPreset");
+            if (qualityPresetProp != null)
+                EditorGUILayout.PropertyField(qualityPresetProp);
+
             PropertyField(m_TemporalAccumulationFactor);
             //PropertyField(m_GhostingReduction);
 

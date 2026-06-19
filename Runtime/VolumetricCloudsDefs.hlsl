@@ -3,9 +3,9 @@
 
 CBUFFER_START(UnityPerMaterial)
 float _Seed;
-half _NumPrimarySteps;
-half _NumLightSteps;
-half _MaxStepSize;
+float _NumPrimarySteps;
+float _NumLightSteps;
+float _MaxStepSize;
 float _HighestCloudAltitude;
 float _LowestCloudAltitude;
 half4 _ShapeNoiseOffset;
