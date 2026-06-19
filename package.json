@@ -16,5 +16,12 @@
   "unity": "6000.0",
   "documentationUrl": "https://github.com/Natteens/urp-volumetric-clouds",
   "changelogUrl": "https://github.com/Natteens/urp-volumetric-clouds/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/Natteens/urp-volumetric-clouds/blob/main/LICENSE.md"
+  "licensesUrl": "https://github.com/Natteens/urp-volumetric-clouds/blob/main/LICENSE.md",
+  "samples": [
+    {
+      "displayName": "Volumetric Clouds Sample",
+      "description": "Sample material and setup assets for URP Volumetric Clouds.",
+      "path": "Samples~/Volumetric Clouds Sample"
+    }
+  ]
 }

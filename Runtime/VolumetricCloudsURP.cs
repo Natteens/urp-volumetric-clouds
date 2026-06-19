@@ -64,6 +64,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     // Pirnt message only once.
     private bool isLogPrinted;
     private bool isCookiePrinted;
+    private bool isPassNullPrinted;
 
     /// <summary>
     /// Gets or sets the material of volumetric clouds shader.
@@ -331,6 +332,16 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         #endif
             return;
         }
+
+        // Create() may not have built the passes yet (e.g. Shader.Find failing during load on some Unity versions); skip safely instead of throwing.
+        if (volumetricCloudsPass == null || volumetricCloudsAmbientPass == null || volumetricCloudsShadowsPass == null)
+        {
+        #if UNITY_EDITOR || DEBUG
+            if (!isPassNullPrinted) { Debug.LogWarning("Volumetric Clouds URP: Render passes are not initialized yet. Skipping until the Renderer Feature finishes setup."); isPassNullPrinted = true; }
+        #endif
+            return;
+        }
+        isPassNullPrinted = false;
 
     #if UNITY_EDITOR
         bool isEditingPrefab = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage() != null;
