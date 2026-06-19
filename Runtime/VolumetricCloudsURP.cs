@@ -71,7 +71,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     public Material CloudsMaterial
     {
         get { return material; }
-        set { material = (value.shader == Shader.Find(shaderName)) ? value : material; }
+        set { material = (value != null && value.shader == Shader.Find(shaderName)) ? value : material; }
     }
 
     /// <summary>
@@ -489,6 +489,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         private readonly static FieldInfo depthTextureFieldInfo = typeof(UniversalRenderer).GetField("m_DepthTexture", BindingFlags.NonPublic | BindingFlags.Instance);
 
         private Texture2D customLutPresetMap;
+        private int customLutHash;
         private readonly Color[] customLutColorArray = new Color[customLutMapResolution];
 
         public const float earthRad = 6378100.0f;
@@ -659,7 +660,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                     mainLightColor = (isLinearColorSpace ? mainLight.color.linear : mainLight.color.gamma) * (mainLight.useColorTemperature ? Mathf.CorrelatedColorTemperatureToRGB(mainLight.colorTemperature) : Color.white) * mainLight.intensity;
 
             #if URP_PHYSICAL_LIGHT
-                bool isPhysicalLight = mainLight.GetComponent<AdditionalLightData>() != null;
+                bool isPhysicalLight = mainLight != null && mainLight.GetComponent<AdditionalLightData>() != null;
 
                 mainLightColor = isPhysicalLight ? mainLightColor : mainLightColor * PI;
             #else
@@ -670,16 +671,30 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 cloudsMaterial.SetVector(sunColor, mainLightColor);
             }
 
-            // Update preset values
-            VolumetricClouds.CloudPresets cloudPreset = cloudsVolume.cloudPreset;
-            cloudsVolume.cloudPreset = cloudPreset;
-
             UpdateMaterialProperties(camera);
             denoiseClouds = cloudsVolume.temporalAccumulationFactor.value >= 0.01f;
         }
 
+        private static int CurveHash(AnimationCurve curve)
+        {
+            if (curve == null)
+                return 0;
+            int h = 17;
+            h = h * 31 + curve.length;
+            for (int i = 0; i < curve.length; i++)
+            {
+                Keyframe k = curve[i];
+                h = h * 31 + k.time.GetHashCode();
+                h = h * 31 + k.value.GetHashCode();
+                h = h * 31 + k.inTangent.GetHashCode();
+                h = h * 31 + k.outTangent.GetHashCode();
+            }
+            return h;
+        }
+
         private void PrepareCustomLutData(VolumetricClouds clouds)
         {
+            bool rebuild = false;
             if (customLutPresetMap == null)
             {
                 customLutPresetMap = new Texture2D(1, customLutMapResolution, GraphicsFormat.R16G16B16A16_SFloat, TextureCreationFlags.None)
@@ -689,13 +704,20 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                     wrapMode = TextureWrapMode.Clamp
                 };
                 customLutPresetMap.hideFlags = HideFlags.HideAndDontSave;
+                rebuild = true;
             }
-
-            var pixels = customLutColorArray;
 
             var densityCurve = clouds.densityCurve.value;
             var erosionCurve = clouds.erosionCurve.value;
             var ambientOcclusionCurve = clouds.ambientOcclusionCurve.value;
+
+            int hash = CurveHash(densityCurve) * 31 + CurveHash(erosionCurve);
+            hash = hash * 31 + CurveHash(ambientOcclusionCurve);
+            if (!rebuild && hash == customLutHash)
+                return;
+            customLutHash = hash;
+
+            var pixels = customLutColorArray;
             Color white = Color.white;
             if (densityCurve == null || densityCurve.length == 0)
             {
@@ -792,6 +814,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         }
 
         #region Non Render Graph Pass
+    #if !UNITY_6000_5_OR_NEWER
         private Light GetMainLight(LightData lightData)
         {
             int shadowLightIndex = lightData.mainLightIndex;
@@ -934,6 +957,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             cmd.Clear();
             CommandBufferPool.Release(cmd);
         }
+    #endif
         #endregion
 
     #if UNITY_6000_0_OR_NEWER
@@ -1235,6 +1259,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         }
 
         #region Non Render Graph Pass
+    #if !UNITY_6000_5_OR_NEWER
     #if UNITY_6000_0_OR_NEWER
         [Obsolete]
     #endif
@@ -1337,6 +1362,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             
             CommandBufferPool.Release(cmd);
         }
+    #endif
         #endregion
 
     #if UNITY_6000_0_OR_NEWER
@@ -1531,6 +1557,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         }
 
         #region Non Render Graph Pass
+    #if !UNITY_6000_5_OR_NEWER
         private Light GetMainLight(LightData lightData)
         {
             int shadowLightIndex = lightData.mainLightIndex;
@@ -1717,6 +1744,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             cmd.Clear();
             CommandBufferPool.Release(cmd);
         }
+    #endif
         #endregion
 
     #if UNITY_6000_0_OR_NEWER
