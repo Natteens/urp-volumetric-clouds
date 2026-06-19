@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.1.2...v0.2.0) (2026-06-19)
+
+
+### Features
+
+* Add renderer/volume quality presets and fixes ([8683e9b](https://github.com/Natteens/urp-volumetric-clouds/commit/8683e9b9a9049092556940dba0659a938dc987e9))
+
 ## [0.1.2](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.1.1...v0.1.2) (2026-02-07)
 
 
