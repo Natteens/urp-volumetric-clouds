@@ -34,6 +34,8 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     [SerializeField] private float resolutionScale = 0.5f;
     [Tooltip("Select the method to use for upscaling volumetric clouds.")]
     [SerializeField] private CloudsUpscaleMode upscaleMode = CloudsUpscaleMode.Bilinear;
+    [Range(0.0f, 8.0f), Tooltip("Reduces the skybox halo around opaque edges when rendering below full resolution with Bilateral upscale. 0 disables it (default). Higher values reject more cloud bleed across depth edges.")]
+    [SerializeField] private float cloudEdgeSoftness = 0.0f;
     [Tooltip("Specifies the preferred texture render mode for volumetric clouds. \nThe Copy Texture mode should be more performant.")]
     [SerializeField] private CloudsRenderMode preferredRenderMode = CloudsRenderMode.CopyTexture;
 
@@ -148,6 +150,12 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
     {
         get { return upscaleMode; }
         set { upscaleMode = value; }
+    }
+
+    public float CloudEdgeSoftness
+    {
+        get { return cloudEdgeSoftness; }
+        set { cloudEdgeSoftness = Mathf.Clamp(value, 0.0f, 8.0f); }
     }
 
     /// <summary>
@@ -383,6 +391,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             volumetricCloudsPass.outputDepth = depthTexture || outputDepth; // Implicitly enable clouds depth when we need to output to scene depth
             volumetricCloudsPass.outputToSceneDepth = depthTexture;
             volumetricCloudsPass.sunAttenuation = sunAttenuation;
+            volumetricCloudsPass.cloudEdgeSoftness = cloudEdgeSoftness;
 
             volumetricCloudsShadowsPass.cloudsVolume = cloudsVolume;
 
@@ -447,6 +456,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         public CloudsRenderMode renderMode;
         public float resolutionScale;
         public CloudsUpscaleMode upscaleMode;
+        public float cloudEdgeSoftness;
         public bool dynamicAmbientProbe;
         public bool resetWindOnStart;
         public bool outputDepth;
@@ -498,6 +508,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         private static readonly int earthRadius = Shader.PropertyToID("_EarthRadius");
         private static readonly int accumulationFactor = Shader.PropertyToID("_AccumulationFactor");
         private static readonly int improvedTransmittanceBlend = Shader.PropertyToID("_ImprovedTransmittanceBlend");
+        private static readonly int edgeSoftness = Shader.PropertyToID("_CloudEdgeSoftness");
         //private static readonly int normalizationFactor = Shader.PropertyToID("_NormalizationFactor");
         private static readonly int cloudsCurveLut = Shader.PropertyToID("_CloudCurveTexture");
         private static readonly int cloudnearPlane = Shader.PropertyToID("_CloudNearPlane");
@@ -678,6 +689,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             cloudsMaterial.SetFloat(earthRadius, actualEarthRad);
             cloudsMaterial.SetFloat(accumulationFactor, cloudsVolume.temporalAccumulationFactor.value);
             cloudsMaterial.SetFloat(improvedTransmittanceBlend, cloudsVolume.perceptualBlending.value);
+            cloudsMaterial.SetFloat(edgeSoftness, cloudEdgeSoftness);
             Vector3 cameraPosPS = camera.transform.position - new Vector3(0.0f, -actualEarthRad, 0.0f);
             cloudsMaterial.SetFloat(cloudnearPlane, max(GetCloudNearPlane(cameraPosPS, bottomAltitude, highestAltitude), camera.nearClipPlane));
 

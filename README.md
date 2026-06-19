@@ -99,6 +99,7 @@ Low and Medium presets render below full resolution and use bilateral upscale wh
 - Temporal accumulation reduces noise but can increase ghosting during motion.
 - Cinematic is not intended as a default gameplay preset.
 - Cloud shadows can be expensive when enabled.
+- `cloudEdgeSoftness` (Renderer Feature) reduces the skybox halo around opaque object edges. It only affects the low-resolution Bilateral upscale path (resolution scale below full with Upscale Mode = Bilateral) and does nothing at full resolution or with Bilinear upscale. Default `0` disables it. Start around `2`–`4` only if an object-edge halo is visible. Higher values add some GPU cost and can introduce blocky edges along silhouettes. It reduces, but does not fully remove, edge artifacts.
 
 ## Known limitations
 
@@ -115,6 +116,7 @@ Low and Medium presets render below full resolution and use bilateral upscale wh
 - Clouds not visible: confirm the Renderer Feature is added and enabled, a valid material is assigned, the Volume override `State` is on, the Volume affects the camera, and the depth texture is available.
 - Clouds too heavy/dense: lower density on the weather/look settings or pick a lighter weather preset; verify the Volume Quality preset is not unintentionally Manual with high authored values.
 - Shimmering at low resolution: use the Bilateral upscale mode, or raise the resolution scale (Low/Medium presets already prefer bilateral below full resolution).
+- Blue/gray halo around object edges at low resolution: with Bilateral upscale, raise `cloudEdgeSoftness` (start `2`–`4`); or render at full resolution. It only applies to the low-resolution Bilateral path and does not fully remove sub-pixel edge fringing.
 - Ghosting during fast camera movement: lower the temporal accumulation factor (or use a lower Volume Quality preset).
 - Cloud shadows not working: ensure light cookies are supported/enabled in the active URP asset and a main directional light is present and active.
 - Scene/Game view mismatch: minor differences are expected because wind animation uses editor vs play time; both should animate.

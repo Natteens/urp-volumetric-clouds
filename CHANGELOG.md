@@ -48,6 +48,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Renderer Feature quality presets (Manual/Low/Medium/High/Cinematic) controlling resolution scale and upscale mode; applied only when changed.
 - Volume quality presets (Manual/Low/Medium/High/Cinematic) controlling primary steps, light steps, temporal accumulation, and perceptual blending; applied only when changed and separate from the weather presets.
+- Optional depth-aware `cloudEdgeSoftness` Renderer Feature control to reduce low-resolution silhouette halo artifacts on the Bilateral upscale path; disabled by default (`0`).
 
 Note: changes are prepared and tested against Unity 6.3 LTS+/6.5 but not yet fully validated across all project configurations.
 
