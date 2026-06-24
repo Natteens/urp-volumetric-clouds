@@ -582,6 +582,10 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
 
         private void UpdateMaterialProperties(Camera camera)
         {
+        #if UNITY_EDITOR
+            // The editor reverts shared material keyword state on scene save; re-assert from current values instead of trusting the cache.
+            keywordStateValid = false;
+        #endif
         #if URP_PBSKY
             bool isVolumeActive = visualEnvVolume != null && visualEnvVolume.IsActive() && visualEnvVolume.skyType.value != 0;
             bool localCloudsOn = isVolumeActive ? (visualEnvVolume.renderingSpace.value == VisualEnvironment.RenderingSpace.World) : cloudsVolume.localClouds.value;
@@ -763,6 +767,9 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 rebuild = true;
             }
 
+            // Rebind every update: the editor reverts shared material state on scene save, which would otherwise leave _CloudCurveTexture unbound until the next curve change.
+            cloudsMaterial.SetTexture(cloudsCurveLut, customLutPresetMap);
+
             var densityCurve = clouds.densityCurve.value;
             var erosionCurve = clouds.erosionCurve.value;
             var ambientOcclusionCurve = clouds.ambientOcclusionCurve.value;
@@ -796,8 +803,6 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
 
             customLutPresetMap.SetPixels(pixels);
             customLutPresetMap.Apply();
-
-            cloudsMaterial.SetTexture(cloudsCurveLut, customLutPresetMap);
         }
 
         private void SetupAmbientProbeIfNeeded(Material cloudsMaterial)
