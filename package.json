@@ -1,6 +1,6 @@
 {
   "name": "com.natteens.urpvolumetricclouds",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "displayName": "URP Volumetric Clouds",
   "description": "Volumetric clouds for the Universal Render Pipeline (URP).",
   "keywords": [

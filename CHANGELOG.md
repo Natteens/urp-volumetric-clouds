@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.3.0...v0.3.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* editor material keywords and LUT binding ([fc01c4d](https://github.com/Natteens/urp-volumetric-clouds/commit/fc01c4da9e4b2e04c2b14f6c42414f91add38727))
+
 # [0.3.0](https://github.com/Natteens/urp-volumetric-clouds/compare/v0.2.1...v0.3.0) (2026-06-19)
 
 
